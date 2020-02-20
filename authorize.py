@@ -90,9 +90,10 @@ class ViolationsChecker:
                 minutes=self.DOUBLE_TRANSACTIONS_MINUTES
             )
             if before_time and (doubled_time > (time - before_time)):
-                violations[before_index][self.TRASACTION_KEY][self.VIOLATIONS_FIELD].append(
-                    self.MSG_DOUBLE_TRANSACTIONS
-                )
+                if self.MSG_DOUBLE_TRANSACTIONS not in violations[before_index][self.TRASACTION_KEY][self.VIOLATIONS_FIELD]:
+                    violations[before_index][self.TRASACTION_KEY][self.VIOLATIONS_FIELD].append(
+                        self.MSG_DOUBLE_TRANSACTIONS
+                    )
                 violations[index][self.TRASACTION_KEY][self.VIOLATIONS_FIELD].append(
                     self.MSG_DOUBLE_TRANSACTIONS
                 )
