@@ -1,6 +1,137 @@
-def run_validations(operations):
+"""
+    This is a small personal credit availability check applicatioN
+"""
+
+import json
+
+
+class ViolationsChecker:
     """
-        Run validations acording business rules
+        Manages checks violations
     """
-    # TODO: Add business rules
-    return []
+
+    # Validations Variables
+    MIN_SCORE = 200
+    MIN_INSTALLMENTS = 6
+    COMPROMISED_INCOME = 0.3
+    DOUBLE_TRANSACTIONS = 2
+
+    # Errors MSG
+    MSG_COMPROMISED_INCOME = 'compromised-income'
+    MSG_LOW_SCORE = 'low-score'
+    MSG_MINIMUM_INSTALLMENTS = 'minimum-installments'
+    MSG_INVALID_DATA = 'Invalid Data'
+
+    # Data
+    TRASACTION_KEY = 'transaction'
+
+    ID_FIELD = 'id'
+    CONSUMER_FIELD = 'consumer_id'
+    SCORE_FIELD = 'score'
+    INCOME_FIELD = 'income'
+    VALUE_FIELD = 'requested_value'
+    INSTALLMENTS_FIELD = 'installments'
+    TIME_FIELD = 'time'
+    VIOLATIONS_FIELD = 'violations'
+    ERROR_FIELD = 'error'
+
+    DATA_FIELD_SET = {
+        ID_FIELD,
+        CONSUMER_FIELD,
+        SCORE_FIELD,
+        INCOME_FIELD,
+        VALUE_FIELD,
+        INSTALLMENTS_FIELD,
+        TIME_FIELD
+    }
+
+    def __init__(self, operations):
+        self.operations = operations
+
+    def is_valid(self, operation):
+        data_keys = isinstance(operation, dict) and operation.get(
+            self.TRASACTION_KEY, {}
+        ).keys()
+        return set(data_keys) == self.DATA_FIELD_SET
+
+    def compromised_income(self, operation):
+        max_installment = operation[self.TRASACTION_KEY][self.INCOME_FIELD] * self.COMPROMISED_INCOME
+        installments = operation[self.TRASACTION_KEY][self.INSTALLMENTS_FIELD]
+        installment = (
+            operation[self.TRASACTION_KEY][self.INSTALLMENTS_FIELD] and
+            operation[self.TRASACTION_KEY][self.VALUE_FIELD] / operation[self.TRASACTION_KEY][self.INSTALLMENTS_FIELD])
+        return installment > max_installment
+
+    def low_score(self, operation):
+        return operation[self.TRASACTION_KEY][self.SCORE_FIELD] < self.MIN_SCORE
+
+    def minimum_installments(self, operation):
+        return operation[self.TRASACTION_KEY][self.INSTALLMENTS_FIELD] < self.MIN_INSTALLMENTS
+
+    def validate_doubled_transactions(self, violations):
+        # TODO: Listar operacoes ordenando pelo tempo
+        # Validar se tem menos de 2 minutos que da ultima transaação
+        # retornar lista com ids das transações duplicadas
+        return violations
+
+    def violations(self):
+        violations = []
+        for operation in self.operations:
+            if self.is_valid(operation):
+                data = {
+                    self.ID_FIELD: operation[self.TRASACTION_KEY][self.ID_FIELD],
+                    self.VIOLATIONS_FIELD: []
+                }
+                if self.low_score(operation):
+                    data[self.VIOLATIONS_FIELD].append(
+                        self.MSG_LOW_SCORE
+                    )
+                if self.compromised_income(operation):
+                    data[self.VIOLATIONS_FIELD].append(
+                        self.MSG_COMPROMISED_INCOME
+                    )
+                if self.minimum_installments(operation):
+                    data[self.VIOLATIONS_FIELD].append(
+                        self.MSG_MINIMUM_INSTALLMENTS
+                    )
+                violations.append({self.TRASACTION_KEY: data})
+            else:
+                violations.append({
+                    self.ERROR_FIELD: self.MSG_INVALID_DATA
+                })
+
+        violations = self.validate_doubled_transactions(violations)
+
+        return violations
+
+
+class Authorizer:
+    """
+        Manages authorization
+    """
+
+    def __init__(self, data):
+        self._data = data
+
+    def _from_json(self, data, decoded=[]):
+        """
+            Run the binary looking for valid json data
+        """
+        try:
+            data = json.loads(data)
+            if isinstance(data, list):
+                decoded = decoded + data
+            else:
+                decoded.append(data)
+        except json.decoder.JSONDecodeError as error:
+            decoded.append(json.loads(data[:error.pos]))
+            return self._from_json(data[error.pos:], decoded)
+        return decoded
+
+    @property
+    def operations(self):
+        return self._from_json(self._data)
+
+    def violations(self):
+        instance = ViolationsChecker(self.operations)
+        return instance.violations()
