@@ -41,6 +41,8 @@ And compile:
 pyinstaller --onefile authorize.py
 ```
 
+The compiled version can be used like script version.
+
 After compilation, the executable will be available on the path:
 ```
 dist/authorize
