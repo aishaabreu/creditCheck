@@ -90,9 +90,10 @@ class ViolationsChecker:
                 minutes=self.DOUBLE_TRANSACTIONS_MINUTES
             )
             if before_time and (doubled_time > (time - before_time)):
-                violations[before_index][self.TRASACTION_KEY][self.VIOLATIONS_FIELD].append(
-                    self.MSG_DOUBLE_TRANSACTIONS
-                )
+                if self.MSG_DOUBLE_TRANSACTIONS not in violations[before_index][self.TRASACTION_KEY][self.VIOLATIONS_FIELD]:
+                    violations[before_index][self.TRASACTION_KEY][self.VIOLATIONS_FIELD].append(
+                        self.MSG_DOUBLE_TRANSACTIONS
+                    )
                 violations[index][self.TRASACTION_KEY][self.VIOLATIONS_FIELD].append(
                     self.MSG_DOUBLE_TRANSACTIONS
                 )
@@ -168,3 +169,14 @@ class Authorizer:
     def violations(self):
         instance = ViolationsChecker(self.operations)
         return instance.violations()
+
+
+if __name__ == '__main__':
+    import sys
+
+    for file_path in sys.argv[1:]:
+        with open(file_path, 'rb') as file:
+            instance = Authorizer(file.read())
+
+            for validation in instance.violations():
+                print(json.dumps(validation))
