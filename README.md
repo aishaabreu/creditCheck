@@ -2,7 +2,9 @@
 
 This is a small personal credit availability check application.
 
-## Using
+[Download Latest Version](https://github.com/feliperian/creditCheck/raw/master/dist/authorize)
+
+## Script Usage
 The file must be passed as a parameter to the script as in the example:
 ```
 python authorize.py operation
@@ -21,4 +23,20 @@ Only python is needed:
 Start unit tests using the following command:
 ```
 python tests.py
+```
+
+## Compiling
+Install python compile requirements:
+```
+pip install -r requirements.txt
+```
+
+And compile:
+```
+pyinstaller --onefile authorize.py
+```
+
+After compilation, the executable will be available on the path:
+```
+dist/authorize
 ```

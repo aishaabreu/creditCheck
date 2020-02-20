@@ -140,5 +140,4 @@ dmypy.json
 # project gitignore
 
 .vscode
-ecred_test.md
-ecred_test.pdf
+doc/
