@@ -38,16 +38,6 @@ class ViolationsChecker:
     VIOLATIONS_FIELD = 'violations'
     ERROR_FIELD = 'error'
 
-    DATA_FIELD_SET = {
-        ID_FIELD,
-        CONSUMER_FIELD,
-        SCORE_FIELD,
-        INCOME_FIELD,
-        VALUE_FIELD,
-        INSTALLMENTS_FIELD,
-        TIME_FIELD
-    }
-
     def __init__(self, operations):
         self.operations = operations
 
