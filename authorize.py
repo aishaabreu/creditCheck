@@ -52,7 +52,7 @@ class ViolationsChecker:
         data_keys = isinstance(operation, dict) and operation.get(
             self.TRASACTION_KEY, {}
         ).keys()
-        return set(data_keys) == self.DATA_FIELD_SET
+        return data_keys and set(data_keys) == self.DATA_FIELD_SET
 
     def compromised_income(self, operation):
         max_installment = operation[self.TRASACTION_KEY][self.INCOME_FIELD] * self.COMPROMISED_INCOME
@@ -110,13 +110,16 @@ class Authorizer:
         Manages authorization
     """
 
+    MSG_INVALID_JSON = 'Invalid JSON'
+
     def __init__(self, data):
         self._data = data
 
-    def _from_json(self, data, decoded=[]):
+    def _from_json(self, data, decoded=None):
         """
             Run the binary looking for valid json data
         """
+        decoded = decoded or []
         try:
             data = json.loads(data)
             if isinstance(data, list):
@@ -130,7 +133,10 @@ class Authorizer:
 
     @property
     def operations(self):
-        return self._from_json(self._data)
+        try:
+            return self._from_json(self._data)
+        except:
+            return [{'error': self.MSG_INVALID_JSON}]
 
     def violations(self):
         instance = ViolationsChecker(self.operations)

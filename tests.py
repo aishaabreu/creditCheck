@@ -17,7 +17,6 @@ class AuthorizerTestCase(unittest.TestCase):
         instance = Authorizer(self.data)
 
         operations = instance.operations
-        print(operations)
         self.assertEqual(len(operations), 3)
         self.assertDictEqual(operations[0], {
             'transaction': {
@@ -43,7 +42,7 @@ class AuthorizerTestCase(unittest.TestCase):
         })
 
     def test_can_check_transaction_is_valid(self):
-        operations = b"""[{
+        data = b"""[{
             "transaction": {
                 "id": 1,
                 "consumer_id": 10,
@@ -55,11 +54,33 @@ class AuthorizerTestCase(unittest.TestCase):
             }
         }]"""
 
-        authorize = Authorizer(operations)
+        instance = Authorizer(data)
 
         self.assertEqual(
-            authorize.violations(),
+            instance.violations(),
             [{'transaction': {'id': 1, 'violations': []}}]
+        )
+
+    def test_can_check_invalid_json(self):
+        data = b''
+
+        instance = Authorizer(data)
+
+        self.assertEqual(
+            instance.operations,
+            [{'error': 'Invalid JSON'}]
+        )
+
+    def test_can_check_transaction_hasvalid_json_and_invalid_data(self):
+        data = b"""{
+            "invalid": true
+        }"""
+
+        instance = Authorizer(data)
+
+        self.assertEqual(
+            instance.violations(),
+            [{'error': 'Invalid Data'}]
         )
 
 
