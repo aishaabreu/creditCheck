@@ -169,3 +169,14 @@ class Authorizer:
     def violations(self):
         instance = ViolationsChecker(self.operations)
         return instance.violations()
+
+
+if __name__ == '__main__':
+    import sys
+
+    for file_path in sys.argv[1:]:
+        with open(file_path, 'rb') as file:
+            instance = Authorizer(file.read())
+
+            for validation in instance.violations():
+                print(json.dumps(validation))

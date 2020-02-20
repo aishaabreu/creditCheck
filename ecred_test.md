@@ -1,4 +1,5 @@
 # Desafio de codificação
+#### Tradução feita para facilitar e tirar dúvidas de compreenção
 Você está encarregado de implementar um aplicativo que autoriza uma transação para uma conta específica seguindo um conjunto de regras predefinidas.
 
 ## Empacotamento
