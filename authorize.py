@@ -3,6 +3,8 @@
 """
 
 import json
+from dateutil import parser
+import datetime
 
 
 class ViolationsChecker:
@@ -64,9 +66,39 @@ class ViolationsChecker:
         return operation[self.TRASACTION_KEY][self.INSTALLMENTS_FIELD] < self.MIN_INSTALLMENTS
 
     def validate_doubled_transactions(self, violations):
-        # TODO: Listar operacoes ordenando pelo tempo
-        # Validar se tem menos de 2 minutos que da ultima transaação
-        # retornar lista com ids das transações duplicadas
+        """
+            Sort the transactions by date and time,
+            checking if there is one with a lower interval than allowed
+        """
+
+        times = sorted([
+            [
+                parser.isoparse(
+                    operation[self.TRASACTION_KEY][self.TIME_FIELD]
+                ),
+                index
+            ] for operation, index in zip(
+                self.operations,
+                range(len(self.operations))
+            ) if not violations[index].get(self.ERROR_FIELD, None)
+        ], key=lambda o: o[0])
+
+        before_index = None
+        before_time = None
+        for time, index in times:
+            doubled_time = datetime.timedelta(
+                minutes=self.DOUBLE_TRANSACTIONS_MINUTES
+            )
+            if before_time and (doubled_time > (time - before_time)):
+                violations[before_index][self.TRASACTION_KEY][self.VIOLATIONS_FIELD].append(
+                    self.MSG_DOUBLE_TRANSACTIONS
+                )
+                violations[index][self.TRASACTION_KEY][self.VIOLATIONS_FIELD].append(
+                    self.MSG_DOUBLE_TRANSACTIONS
+                )
+            before_time = time
+            before_index = index
+
         return violations
 
     def violations(self):
