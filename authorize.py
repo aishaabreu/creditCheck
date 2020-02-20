@@ -14,12 +14,13 @@ class ViolationsChecker:
     MIN_SCORE = 200
     MIN_INSTALLMENTS = 6
     COMPROMISED_INCOME = 0.3
-    DOUBLE_TRANSACTIONS = 2
+    DOUBLE_TRANSACTIONS_MINUTES = 2
 
     # Errors MSG
     MSG_COMPROMISED_INCOME = 'compromised-income'
     MSG_LOW_SCORE = 'low-score'
     MSG_MINIMUM_INSTALLMENTS = 'minimum-installments'
+    MSG_DOUBLE_TRANSACTIONS = 'doubled-transactions'
     MSG_INVALID_DATA = 'Invalid Data'
 
     # Data
@@ -48,12 +49,6 @@ class ViolationsChecker:
     def __init__(self, operations):
         self.operations = operations
 
-    def is_valid(self, operation):
-        data_keys = isinstance(operation, dict) and operation.get(
-            self.TRASACTION_KEY, {}
-        ).keys()
-        return data_keys and set(data_keys) == self.DATA_FIELD_SET
-
     def compromised_income(self, operation):
         max_installment = operation[self.TRASACTION_KEY][self.INCOME_FIELD] * self.COMPROMISED_INCOME
         installments = operation[self.TRASACTION_KEY][self.INSTALLMENTS_FIELD]
@@ -77,7 +72,7 @@ class ViolationsChecker:
     def violations(self):
         violations = []
         for operation in self.operations:
-            if self.is_valid(operation):
+            try:
                 data = {
                     self.ID_FIELD: operation[self.TRASACTION_KEY][self.ID_FIELD],
                     self.VIOLATIONS_FIELD: []
@@ -95,7 +90,7 @@ class ViolationsChecker:
                         self.MSG_MINIMUM_INSTALLMENTS
                     )
                 violations.append({self.TRASACTION_KEY: data})
-            else:
+            except:
                 violations.append({
                     self.ERROR_FIELD: self.MSG_INVALID_DATA
                 })
