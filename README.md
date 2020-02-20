@@ -5,6 +5,11 @@ This is a small personal credit availability check application.
 [Download Latest Linux Version](https://github.com/feliperian/creditCheck/raw/master/dist/authorize)
 
 ## Script Usage
+The data for each operation should be like this:
+```
+{ "transaction": { "id": 1, "consumer_id": 10, "score": 600, "income": 4000, "requested_value": 10000, "installments": 15, "time": "2019-02-13T10:00:00.000Z"}}
+```
+
 The file must be passed as a parameter to the script as in the example:
 ```
 python authorize.py operation
