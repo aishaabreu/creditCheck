@@ -2,7 +2,7 @@
 
 This is a small personal credit availability check application.
 
-[Download Latest Version](https://github.com/feliperian/creditCheck/raw/master/dist/authorize)
+[Download Latest Linux Version](https://github.com/feliperian/creditCheck/raw/master/dist/authorize)
 
 ## Script Usage
 The file must be passed as a parameter to the script as in the example:

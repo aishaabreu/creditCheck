@@ -43,7 +43,6 @@ class ViolationsChecker:
 
     def compromised_income(self, operation):
         max_installment = operation[self.TRASACTION_KEY][self.INCOME_FIELD] * self.COMPROMISED_INCOME
-        installments = operation[self.TRASACTION_KEY][self.INSTALLMENTS_FIELD]
         installment = (
             operation[self.TRASACTION_KEY][self.INSTALLMENTS_FIELD] and
             operation[self.TRASACTION_KEY][self.VALUE_FIELD] / operation[self.TRASACTION_KEY][self.INSTALLMENTS_FIELD])
